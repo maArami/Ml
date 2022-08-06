@@ -1,42 +1,37 @@
 import numpy as np
 
-
-class LogisticRegression:
-    def __init__(self, lr=0.001, n_itr=500):
+class LogisticRegressin:
+    def __init__(self, lr=0.0001, n_itr=1000):
         self.lr = lr
         self.n_itr = n_itr
-        self.weights = None
-        self.Error = None
+        self.weightes = None
+        self.bias = None
 
-    def fit(self, _X, y):
-        n_samples, n_features = _X.shape
-        X = np.ones((n_samples, n_features+1)) #insert [1] column in matrix
-        X[:,0:n_features] = _X 
-        y = np.array([-1 if i==0 else +1 for i in y])
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.weightes = np.zeros(n_features)
+        self.bias = 0
 
-        self.weights = np.zeros(n_features+1)
-        Egrad = np.zeros(n_features+1)
-        
         for _ in range(self.n_itr):
 
-            for i in range(n_samples):
-                Egrad = Egrad + (y[i]*X[i,:])/(1 + np.exp(y[i]*np.dot(self.weights,X[i,:])))
-            Egrad /= (-n_samples)
-            self.weights = self.weights - self.lr*Egrad
-            Egrad *= 0
-        
+            y_predict = self.predict(X)
+            dw = (1 / n_samples)*np.dot(X.T, y_predict - y)
+            db = (1 / n_samples)*np.sum(y_predict - y)
 
-    def predict(self, _X):
-        n_samples, n_features = _X.shape
-        X = np.ones((n_samples, n_features+1)) #insert [1] column in matrix
-        X[:,0:n_features] = _X 
+            self.weightes = self.weightes - self.lr*dw
+            self.bias = self.bias - self.lr*db
 
-        return self.sigmoid(np.dot(X,self.weights))
+
+    def predict(self, X):
+        y_predict = self.sigmoid( np.dot(X, self.weightes) + self.bias )
+        return y_predict
     
     def predict_cls(self, X):
         y_predict = self.predict(X)
-        y_predict = np.array([+1 if i>=0.5 else 0 for i in y_predict])
-        return y_predict 
+        y_cls = np.array([1 if i>=0.5 else 0 for i in y_predict])
+        return y_cls
 
     def sigmoid(self, X):
-        return 1/( 1 + np.exp(-X))
+        return 1/(1+np.exp(-X))
+
+    
