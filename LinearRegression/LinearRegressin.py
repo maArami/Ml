@@ -21,3 +21,30 @@ class LinearRegression:
         X[:,0:n_features] = _X
 
         return np.dot(X, self.weights)
+#----------------------------------------------------------------------------
+
+#linear Regresion with GD method
+class LinearRegression_GD:
+
+    def __init__(self, lr=0.001, n_itr=10000):
+        self.lr = lr
+        self.n_itr= n_itr
+        self.weights = None
+        self.bias = None
+
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.weights = np.zeros(n_features)
+        self.bias = 0
+
+        for _ in range(self.n_itr):
+            y_predict = self.predict(X)
+            dw = (2/n_samples)*np.dot(X.T, (y_predict - y))
+            db = (2/n_samples)*np.sum( y_predict - y)
+
+            self.weights = self.weights - self.lr*dw
+            self.bias = self.bias - self.lr*db
+
+    def predict(self, X):
+        y_predict = np.dot(X, self.weights) + self.bias
+        return y_predict
